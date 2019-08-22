@@ -1,0 +1,136 @@
+﻿<Window x:Class="TestApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TestApp"
+        xmlns:chartingToolkit="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="600" Width="800">
+
+    <Window.Resources>
+
+        <Style
+            x:Key="ArrivalColumnPointStyle"
+            TargetType="{x:Type chartingToolkit:ColumnDataPoint}">
+            <Setter Property="Background">
+                <Setter.Value>
+                    <SolidColorBrush Color="Green"></SolidColorBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="chartingToolkit:ColumnDataPoint">
+                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Opacity="1" x:Name="Root">
+                            <ToolTipService.ToolTip>
+                                <ContentControl Content="{TemplateBinding FormattedDependentValue}" />
+                            </ToolTipService.ToolTip>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style
+            x:Key="DepartureColumnPointStyle"
+            TargetType="{x:Type chartingToolkit:ColumnDataPoint}">
+            <Setter Property="Background">
+                <Setter.Value>
+                    <SolidColorBrush Color="Red"></SolidColorBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="chartingToolkit:ColumnDataPoint">
+                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Opacity="1" x:Name="Root">
+                            <ToolTipService.ToolTip>
+                                <ContentControl Content="{TemplateBinding FormattedDependentValue}" />
+                            </ToolTipService.ToolTip>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style
+            x:Key="TextBlockPassStyle"
+            TargetType="{x:Type TextBlock}">
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Foreground" Value="WhiteSmoke" />
+            <Setter Property="FontSize" Value="18" />
+        </Style>
+
+        <Style
+            x:Key="TextBlockCenterStyle"
+            TargetType="{x:Type TextBlock}">
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+
+
+        <ControlTemplate x:Key="PassengersInfoControlTemplate" TargetType="{x:Type UserControl}">
+            <Grid Background="{TemplateBinding Background}" Margin="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*"></ColumnDefinition>
+                    <ColumnDefinition Width="1*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="В последнем рейсе" Style="{StaticResource TextBlockPassStyle}"></TextBlock>
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="За последние 24 часа" Style="{StaticResource TextBlockPassStyle}"></TextBlock>
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Сумма за все время" Style="{StaticResource TextBlockPassStyle}"></TextBlock>
+
+                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding LastCount}" Style="{StaticResource TextBlockPassStyle}"></TextBlock>
+                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding LastDayCount}" Style="{StaticResource TextBlockPassStyle}"></TextBlock>
+                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding TotalCount}" Style="{StaticResource TextBlockPassStyle}"></TextBlock>
+
+            </Grid>
+        </ControlTemplate>
+
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"></RowDefinition>
+            <RowDefinition Height="1*"></RowDefinition>
+            <RowDefinition Height="2*"></RowDefinition>
+            <RowDefinition Height="4*"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"></ColumnDefinition>
+                <ColumnDefinition Width="3*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock x:Name="timeBox" Grid.Column="0" Text="{Binding Path=NowTime, StringFormat=HH:mm dd.MM.yyyy}" Style="{StaticResource TextBlockCenterStyle}" FontSize="18"></TextBlock>
+            <Slider Grid.Column="1" Thumb.DragCompleted="Slider_DragCompleted" ValueChanged="Slider_ValueChanged" Maximum="10000" Minimum="1" VerticalAlignment="Center" Margin="50,0"></Slider>
+        </Grid>
+
+        <TextBlock Grid.Row="1" Text="{Binding LastFlight}" Style="{StaticResource TextBlockCenterStyle}" FontSize="26"></TextBlock>
+        
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <UserControl x:Name="arrivalControl" Grid.Column="0" Template="{StaticResource PassengersInfoControlTemplate}" Background="Green">></UserControl>
+            <UserControl x:Name="departureControl" Grid.Column="1" Template="{StaticResource PassengersInfoControlTemplate}" Background="Red"></UserControl>
+        </Grid>
+
+        <chartingToolkit:Chart  Name="lastDayStat" Grid.Row="3" BorderBrush="Transparent" FontSize="18">
+            <chartingToolkit:Chart.Series>
+                <chartingToolkit:StackedColumnSeries>
+                    <chartingToolkit:SeriesDefinition  Title="Прилет"  DependentValuePath="Value" IndependentValuePath="Key" ItemsSource="{Binding ArrivalFlights.LastDayStat}" DataPointStyle="{StaticResource ArrivalColumnPointStyle}"/>
+                    <chartingToolkit:SeriesDefinition  Title="Вылет"  DependentValuePath="Value" IndependentValuePath="Key" ItemsSource="{Binding DepartureFlights.LastDayStat}" DataPointStyle="{StaticResource DepartureColumnPointStyle}"/>
+                </chartingToolkit:StackedColumnSeries>
+            </chartingToolkit:Chart.Series>
+        </chartingToolkit:Chart>
+
+    </Grid>
+</Window>
